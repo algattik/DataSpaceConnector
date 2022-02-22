@@ -23,6 +23,7 @@ import jakarta.ws.rs.core.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.eclipse.dataspaceconnector.common.testfixtures.TestUtils;
 import org.eclipse.dataspaceconnector.extension.jetty.JettyConfiguration;
 import org.eclipse.dataspaceconnector.extension.jetty.JettyService;
 import org.eclipse.dataspaceconnector.extension.jetty.PortMapping;
@@ -42,6 +43,7 @@ import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.eclipse.dataspaceconnector.common.testfixtures.TestUtils.getFreePort;
+import static org.eclipse.dataspaceconnector.common.testfixtures.TestUtils.testOkHttpClientBuilder;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -235,7 +237,7 @@ public class JerseyRestServiceTest {
     private Response executeRequest(String url) {
 
         try {
-            var client = new OkHttpClient.Builder().build();
+            var client = testOkHttpClientBuilder().build();
             var request = new Request.Builder().url(url).build();
             return client.newCall(request).execute();
         } catch (IOException e) {

@@ -14,6 +14,8 @@
 
 package org.eclipse.dataspaceconnector.common.testfixtures;
 
+import okhttp3.OkHttpClient;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -24,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -118,5 +121,16 @@ public class TestUtils {
             throw new IllegalArgumentException(format("No free ports in the range [%d - %d]", lowerBound, upperBound));
         }
         return port;
+    }
+
+    public static OkHttpClient.Builder testOkHttpClientBuilder() {
+        return new OkHttpClient.Builder()
+                .connectTimeout(1, TimeUnit.MINUTES)
+                .writeTimeout(1, TimeUnit.MINUTES)
+                .readTimeout(1, TimeUnit.MINUTES);
+    }
+
+    public static OkHttpClient.Builder xxx() {
+        return testOkHttpClientBuilder();
     }
 }

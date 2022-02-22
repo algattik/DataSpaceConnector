@@ -70,7 +70,7 @@ class WebDidResolverTest {
     }
 
     private WebDidResolver createResolver(Interceptor... interceptors) {
-        var builder = new OkHttpClient.Builder();
+        var builder = xxx();
         for (Interceptor interceptor : interceptors) {
             builder.addInterceptor(interceptor);
         }

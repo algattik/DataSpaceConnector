@@ -81,7 +81,7 @@ class MultipartDispatcherIntegrationTest extends AbstractMultipartDispatcherInte
         transformerRegistry = mock(TransformerRegistry.class);
 
         Vault vault = mock(Vault.class);
-        var httpClient = new OkHttpClient.Builder()
+        var httpClient = xxx()
                 .connectTimeout(1, TimeUnit.MINUTES)
                 .writeTimeout(1, TimeUnit.MINUTES)
                 .readTimeout(1, TimeUnit.MINUTES)

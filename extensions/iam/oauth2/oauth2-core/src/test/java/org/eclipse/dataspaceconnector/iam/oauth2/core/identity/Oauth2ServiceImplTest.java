@@ -75,7 +75,7 @@ class Oauth2ServiceImplTest {
                 .identityProviderKeyResolver(publicKeyResolverMock)
                 .build();
 
-        authService = new Oauth2ServiceImpl(configuration, jwsSigner, new OkHttpClient.Builder().build(), new JwtDecoratorRegistryImpl(), new TypeManager());
+        authService = new Oauth2ServiceImpl(configuration, jwsSigner, xxx().build(), new JwtDecoratorRegistryImpl(), new TypeManager());
     }
 
     @Test

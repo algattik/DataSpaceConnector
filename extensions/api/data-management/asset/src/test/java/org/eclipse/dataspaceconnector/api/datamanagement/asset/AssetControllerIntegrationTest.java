@@ -37,6 +37,7 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.dataspaceconnector.api.datamanagement.asset.TestFunctions.createAssetEntryDto;
 import static org.eclipse.dataspaceconnector.api.datamanagement.asset.TestFunctions.createAssetEntryDto_emptyAttributes;
+import static org.eclipse.dataspaceconnector.common.testfixtures.TestUtils.testOkHttpClientBuilder;
 import static org.mockito.Mockito.mock;
 
 public class AssetControllerIntegrationTest {
@@ -63,7 +64,7 @@ public class AssetControllerIntegrationTest {
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
-        client = new OkHttpClient();
+        client = testOkHttpClientBuilder().build();
     }
 
     @Test
