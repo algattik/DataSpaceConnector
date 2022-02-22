@@ -129,8 +129,4 @@ public class TestUtils {
                 .writeTimeout(1, TimeUnit.MINUTES)
                 .readTimeout(1, TimeUnit.MINUTES);
     }
-
-    public static OkHttpClient.Builder xxx() {
-        return testOkHttpClientBuilder();
-    }
 }
