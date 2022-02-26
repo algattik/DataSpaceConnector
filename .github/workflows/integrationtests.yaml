@@ -22,6 +22,11 @@ jobs:
       - name: Setup Gradle cache
         uses: gradle/gradle-build-action@v2
 
+      - name: Launch Cosmos DB Emulator
+        run: |
+          Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
+          Start-CosmosDbEmulator
+
       - name: CosmosDB Transfer Process Store Test
         run: ./gradlew extensions:azure:cosmos:transfer-process-store-cosmos:test
 
