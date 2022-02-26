@@ -25,7 +25,7 @@ jobs:
       - name: Launch Cosmos DB Emulator
         run: |
           Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
-          Start-CosmosDbEmulator
+          Start-CosmosDbEmulator -Timeout 600
 
       - name: CosmosDB Transfer Process Store Test
         run: ./gradlew extensions:azure:cosmos:transfer-process-store-cosmos:test
