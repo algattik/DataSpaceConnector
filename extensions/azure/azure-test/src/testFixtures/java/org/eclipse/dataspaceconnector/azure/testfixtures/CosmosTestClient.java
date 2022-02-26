@@ -27,7 +27,7 @@ public interface CosmosTestClient {
 
     static CosmosClient createClient() {
         var cosmosKey = propOrEnv("COSMOS_KEY", null);
-        if (!StringUtils.isNullOrBlank(cosmosKey)) {
+        if (cosmosKey != null) {
             return azureClient(cosmosKey);
         } else {
             return localClient();
