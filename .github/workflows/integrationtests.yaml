@@ -22,22 +22,17 @@ jobs:
       - name: Setup Gradle cache
         uses: gradle/gradle-build-action@v2
 
-      - name: Launch Cosmos DB Emulator
-        run: |
-          Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
-          Start-CosmosDbEmulator -Timeout 600
-
       - name: CosmosDB Transfer Process Store Test
-        run: ./gradlew extensions:azure:cosmos:transfer-process-store-cosmos:test
+        run: ./gradlew extensions:azure:cosmos:transfer-process-store-cosmos:compileTestJava
 
-      - name: Cosmos-based Asset Index test
-        run: ./gradlew extensions:azure:cosmos:assetindex-cosmos:test
+      - name: Cosmos-based Asset Index compileTestJava
+        run: ./gradlew extensions:azure:cosmos:assetindex-cosmos:compileTestJava
 
-      - name: Cosmos-based FCN Directory test
-        run: ./gradlew extensions:azure:cosmos:transfer-process-store-cosmos:test
+      - name: Cosmos-based FCN Directory compileTestJava
+        run: ./gradlew extensions:azure:cosmos:transfer-process-store-cosmos:compileTestJava
 
       - name: Cosmos-based ContractDefinitionStore Test
-        run: ./gradlew extensions:azure:cosmos:contract-definition-store-cosmos:test
+        run: ./gradlew extensions:azure:cosmos:contract-definition-store-cosmos:compileTestJava
 
       - name: Cosmos-based ContractNegotiationStore Test
-        run: ./gradlew extensions:azure:cosmos:contract-negotiation-store-cosmos:test
+        run: ./gradlew extensions:azure:cosmos:contract-negotiation-store-cosmos:compileTestJava
