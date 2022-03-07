@@ -27,6 +27,7 @@ the detailed section referring to by linking pull requests or issues.
 * Change scope used for obtaining a token for ids multipart (#731)
 * Refactor ids token validation as extension (#625)
 * All `CosmosDocument` subclasses now use a configurable partition key (#780)
+* Enabled pluggable transfer service in DPF (#844)
 
 #### Removed
 
