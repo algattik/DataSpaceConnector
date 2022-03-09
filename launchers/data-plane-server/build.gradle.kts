@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":extensions:data-plane:data-plane-framework"))
     implementation(project(":extensions:data-plane:data-plane-http"))
     implementation(project(":extensions:azure:data-plane:storage"))
+    implementation(project(":extensions:azure:data-plane:data-factory"))
     implementation(project(":extensions:data-plane:data-plane-api"))
 }
 
