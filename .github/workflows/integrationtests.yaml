@@ -36,4 +36,4 @@ jobs:
           cache: 'gradle'
 
       - name: Data Plane Azure Data Factory Test
-        run: ./gradlew extensions:azure:data-plane:data-factory:check
+        run: ./gradlew extensions:azure:data-plane:data-factory:test
