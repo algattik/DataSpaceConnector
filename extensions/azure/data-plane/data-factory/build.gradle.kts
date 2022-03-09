@@ -33,6 +33,7 @@ dependencies {
     testImplementation(testFixtures(project(":extensions:azure:azure-test")))
     testImplementation(testFixtures(project(":extensions:azure:data-plane:storage")))
     testImplementation(testFixtures(project(":common:util")))
+    testImplementation(testFixtures(project(":launchers:junit")))
 }
 
 publishing {

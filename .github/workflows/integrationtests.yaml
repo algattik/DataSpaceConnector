@@ -7,7 +7,21 @@ permissions:
   contents: read
 
 jobs:
+  check-env:
+    environment: Azure-dev
+    runs-on: ubuntu-latest
+    steps:
+      - id: has-azure
+        env:
+          FEATURE: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        if: "${{ env.FEATURE != '' }}"
+        run: echo "::set-output name=defined::true"
+    outputs:
+      has-azure: ${{ steps.has-azure.outputs.defined }}
+
   Azure-Cloud-Integration-Test:
+    needs: [ check-env ]
+    if: needs.check-env.outputs.has-azure == 'true'
     environment: Azure-dev
     runs-on: ubuntu-latest
 
@@ -29,6 +43,17 @@ jobs:
           pwd 
 
       - uses: actions/checkout@v2
+
+      - name: "terraform outputs"
+        run: |
+          printf "$CLOUD_SETTINGS" > cloud_settings.json
+        env:
+          CLOUD_SETTINGS: ${{ secrets.CLOUD_SETTINGS }}
+
+      - name: "terraform outputs"
+        run: |
+          cat cloud_settings.json
+
       - uses: actions/setup-java@v2
         with:
           distribution: 'temurin'

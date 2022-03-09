@@ -30,8 +30,20 @@ az group create --name $providerRg -l "$location"
 az group create --name $consumerRg -l "$location"
 
 # Create storage accounts for provider-side data (source) and consumer-side data (sink)
+
 az storage account create --name $provstore --resource-group $providerRg
+provstoreResourceId=$(az storage account show --name $provstore --resource-group $providerRg --query id -o tsv)
+# Grant test access to storage keys
+az role assignment create --assignee "$appId" \
+  --role "Storage Account Contributor" \
+  --scope "$provstoreResourceId"
+
 az storage account create --name $consstore --resource-group $consumerRg
+consstoreResourceId=$(az storage account show --name $consstore --resource-group $consumerRg --query id -o tsv)
+# Grant test access to storage keys
+az role assignment create --assignee "$appId" \
+  --role "Storage Account Contributor" \
+  --scope "$consstoreResourceId"
 
 # Create ADF
 az datafactory create --location "$location" --name "$adf" --resource-group "$providerRg"

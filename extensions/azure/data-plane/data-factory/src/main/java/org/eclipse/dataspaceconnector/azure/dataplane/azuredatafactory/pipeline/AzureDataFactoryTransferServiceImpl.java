@@ -13,13 +13,7 @@
  */
 package org.eclipse.dataspaceconnector.azure.dataplane.azuredatafactory.pipeline;
 
-import com.azure.core.management.AzureEnvironment;
-import com.azure.core.management.profile.AzureProfile;
 import com.azure.core.util.Context;
-import com.azure.identity.AzureCliCredential;
-import com.azure.identity.AzureCliCredentialBuilder;
-import com.azure.identity.DefaultAzureCredentialBuilder;
-import com.azure.resourcemanager.AzureResourceManager;
 import com.azure.resourcemanager.datafactory.DataFactoryManager;
 import com.azure.resourcemanager.datafactory.models.AzureBlobStorageLocation;
 import com.azure.resourcemanager.datafactory.models.AzureKeyVaultSecretReference;
@@ -34,10 +28,8 @@ import com.azure.resourcemanager.datafactory.models.LinkedServiceReference;
 import com.azure.resourcemanager.datafactory.models.LinkedServiceResource;
 import com.azure.resourcemanager.datafactory.models.PipelineElapsedTimeMetricPolicy;
 import com.azure.resourcemanager.datafactory.models.PipelinePolicy;
-import com.azure.resourcemanager.keyvault.models.Vault;
 import com.azure.resourcemanager.resources.models.GenericResource;
 import com.azure.security.keyvault.secrets.SecretClient;
-import com.azure.security.keyvault.secrets.SecretClientBuilder;
 import org.eclipse.dataspaceconnector.azure.dataplane.azurestorage.schema.AzureBlobStoreSchema;
 import org.eclipse.dataspaceconnector.dataplane.spi.pipeline.TransferService;
 import org.eclipse.dataspaceconnector.dataplane.spi.result.TransferResult;
@@ -58,32 +50,22 @@ import static java.lang.String.format;
 import static org.eclipse.dataspaceconnector.azure.dataplane.azurestorage.validator.AzureStorageValidator.validateAccountName;
 import static org.eclipse.dataspaceconnector.azure.dataplane.azurestorage.validator.AzureStorageValidator.validateContainerName;
 import static org.eclipse.dataspaceconnector.azure.dataplane.azurestorage.validator.AzureStorageValidator.validateSharedKey;
-import static org.eclipse.dataspaceconnector.common.configuration.ConfigurationFunctions.propOrEnv;
 import static org.eclipse.dataspaceconnector.spi.response.ResponseStatus.ERROR_RETRY;
 
 public class AzureDataFactoryTransferServiceImpl implements TransferService {
+    private final DataFactoryManager dataFactoryManager;
+    private final GenericResource factory;
     private final Monitor monitor;
+    private final String keyVaultLinkedService;
+    private final SecretClient secretClient;
+    private final Context context = Context.NONE;
 
-    static String keyVaultLinkedService = propOrEnv("edc.datafactory.keyvault.linkedservicename", "AzureKeyVault");
-    static String dataFactoryId = requiredPropOrEnv("edc.datafactory.resourceid");
-    static String keyVaultId = requiredPropOrEnv("edc.datafactory.keyvault.resourceid");
-
-    static AzureCliCredential credential = new AzureCliCredentialBuilder().build();
-    static AzureProfile profile = new AzureProfile(AzureEnvironment.AZURE);
-    static DataFactoryManager dataFactoryManager = DataFactoryManager.authenticate(credential, profile);
-    public static AzureResourceManager resourceManager = AzureResourceManager.authenticate(credential, profile)
-            .withSubscription(requiredPropOrEnv("AZURE_SUBSCRIPTION_ID"));
-    static GenericResource factory = resourceManager.genericResources().getById(dataFactoryId);
-    static Vault vault = resourceManager.vaults().getById(keyVaultId);
-
-    static Context context = Context.NONE;
-    static SecretClient secretClient = new SecretClientBuilder()
-            .vaultUrl(vault.vaultUri())
-            .credential(new DefaultAzureCredentialBuilder().build())
-            .buildClient();
-
-    public AzureDataFactoryTransferServiceImpl(Monitor monitor) {
+    public AzureDataFactoryTransferServiceImpl(Monitor monitor, DataFactoryManager dataFactoryManager, GenericResource factory, SecretClient secretClient, String keyVaultLinkedService) {
         this.monitor = monitor;
+        this.dataFactoryManager = dataFactoryManager;
+        this.factory = factory;
+        this.secretClient = secretClient;
+        this.keyVaultLinkedService = keyVaultLinkedService;
     }
 
     @Override
@@ -227,9 +209,5 @@ public class AzureDataFactoryTransferServiceImpl implements TransferService {
     private enum DataFactoryPipelineRunStates {
         Queued, InProgress, Succeeded, Failed,
         Canceling, Cancelled
-    }
-
-    private static String requiredPropOrEnv(String s) {
-        return Objects.requireNonNull(propOrEnv(s, null), s);
     }
 }
