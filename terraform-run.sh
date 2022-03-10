@@ -2,22 +2,20 @@
 
 set -euo pipefail
 
-REPO=${1:-eclipse-dataspaceconnector/DataSpaceConnector}
 ENVIRONMENT=Azure-dev
 
-gh="gh --repo $REPO --env $ENVIRONMENT"
+echo "== Running terraform init =="
+. terraform-init.sh
 
 echo "== Checking GitHub contributor permissions =="
+gh="gh --repo $GITHUB_REPO --env $ENVIRONMENT"
 if ! $gh secret list > /dev/null
 then
-  echo "Cannot access repo $REPO"
-  echo "Usage: $0 OWNER/REPO"
+  echo "Cannot access repo $GITHUB_REPO"
+  echo "Usage: $0 OWNER/REPO TerraformStateStorageAccountName"
   echo "OWNER/REPO must be a repository on which you have Contributor permissions."
   exit 1
 fi
-
-echo "== Running terraform init =="
-terraform init
 
 echo "== Running terraform apply =="
 terraform apply

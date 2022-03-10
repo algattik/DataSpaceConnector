@@ -4,7 +4,7 @@ set -euxo pipefail
 
 output=terraform_outputs.json
 
-terraform init
+. terraform-init.sh
 
 terraform output -json > $output
 

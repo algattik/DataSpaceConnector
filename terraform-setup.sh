@@ -1,14 +1,14 @@
 #!/bin/bash
 
-RESOURCE_GROUP_NAME=tfstate
-STORAGE_ACCOUNT_NAME=edcciterraform
-CONTAINER_NAME=tfstate
+set -euxo pipefail
+
+. .env
 
 # Create resource group
-az group create --name $RESOURCE_GROUP_NAME --location eastus
+az group create --name "$TERRAFORM_STATE_STORAGE_RESOURCE_GROUP" --location "$TERRAFORM_STATE_STORAGE_LOCATION"
 
 # Create storage account
-az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_ACCOUNT_NAME
+az storage account create --resource-group "$TERRAFORM_STATE_STORAGE_RESOURCE_GROUP" --name "$TERRAFORM_STATE_STORAGE_ACCOUNT"
 
 # Create blob container
-az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME
+az storage container create --name "$TERRAFORM_STATE_STORAGE_CONTAINER" --account-name "$TERRAFORM_STATE_STORAGE_ACCOUNT"

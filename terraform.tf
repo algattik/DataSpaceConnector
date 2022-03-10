@@ -11,13 +11,6 @@ terraform {
       version = "=2.98.0"
     }
   }
-
-  backend "azurerm" {
-    resource_group_name  = "tfstate"
-    storage_account_name = "edcciterraform"
-    container_name       = "tfstate"
-    key                  = "dev.terraform.tfstate"
-  }
 }
 
 
