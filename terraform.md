@@ -2,7 +2,7 @@
 
 ## Usage
 
-### About
+### Overview
 
 A cloud deployment is required to test the integration with resources that cannot be run in a local emulator, such as Azure Data Factory.
 
@@ -19,7 +19,7 @@ When running pull requests across repositories (from a repository fork), the wor
 
 If the PR author has reason to expect that the PR may break cloud tests, they should configure credentials for an Azure environment on their fork and provision Azure resources. This will cause the cloud testing workflow to run on their fork (outside of PR checks). The author should attach evidence of the cloud testing workflow run to the PR.
 
-Alternatively, the reviewer from the upstream repository may pull the PR into a temporary branch on the upstream repository in order to trigger the cloud testing workflow (outside of PR checks).
+Alternatively, the reviewer from the upstream repository may pull the PR into a temporary branch on the upstream repository in order to trigger the cloud testing workflow (outside of PR checks). This should only be done after careful inspection that the code is not leaking credentials.
 
 ## Deploying an Azure environment
 
@@ -48,9 +48,9 @@ You will need:
 - For **Environment Name**, type `Azure-dev`.
 - For **Name**, type any name.
 
-### Configure Terraform scripts
+### Configure Terraform settings
 
-Provided shell scripts wrapping Terraform commands take their configuration from a file named `.env` that should not be committed into the repository. Copy and adapt the settings file to your environment:
+The shell scripts that wrap Terraform commands take their configuration from a file named `.env` that should not be committed into the repository (though the file should be shared across developers in your fork). Copy and adapt the example settings file to your environment, following the comments in the file:
 
 ```bash
 cp .env.example .env
@@ -64,20 +64,27 @@ The first time only, set up the state storage account by running this script:
 ./terraform-initialize.sh
 ```
 
-After that, run this script to update cloud resources. Follow the prompt and enter `yes` to apply any changes:
+After that, run this script to update cloud resources. Follow the prompt and enter `yes` if requested to apply any changes:
 
 ```bash
 ./terraform-apply.sh
 ```
 
-The script also configures your repository's GitHub Environment so that workflows can consume the resources.
+The script also configures your repository's GitHub Environment so that workflows can consume the resources. The following secrets are provisioned in the Environment:
 
-### Consuming Terraform resources
+- `AZURE_TENANT_ID`, `AZURE_CLIENT_ID` , and `AZURE_SUBSCRIPTION_ID`, required to log in with the Federated Credential scenario.
+- `TERRAFORM_OUTPUTS`, a JSON string containing resource identifiers and other settings needed to connect tests to the resources deployed with Terraform.
 
-In development, run this script to download a `terraform_outputs.json` file:
+Note that these values do not actually contain any sensitive information.
+
+That is sufficient to have the cloud testing workflow run in your fork on every Git push.
+
+### Consuming Terraform resources locally
+
+For running cloud tests in local development, run this script to download a `terraform_outputs.json` file:
 
 ```bash
 ./terraform-fetch.sh
 ```
 
-This downloads a `terraform_outputs.json` file, which is read by cloud integration tests.
+This downloads a `terraform_outputs.json` file, which is read by cloud integration tests. This file should not be committed to the repository.
