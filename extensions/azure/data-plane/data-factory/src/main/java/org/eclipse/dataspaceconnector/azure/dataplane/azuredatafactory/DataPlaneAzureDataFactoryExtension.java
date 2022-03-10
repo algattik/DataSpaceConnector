@@ -13,15 +13,11 @@
  */
 package org.eclipse.dataspaceconnector.azure.dataplane.azuredatafactory;
 
-import com.azure.core.management.AzureEnvironment;
+import com.azure.core.credential.TokenCredential;
 import com.azure.core.management.profile.AzureProfile;
-import com.azure.identity.AzureCliCredential;
-import com.azure.identity.AzureCliCredentialBuilder;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.resourcemanager.AzureResourceManager;
 import com.azure.resourcemanager.datafactory.DataFactoryManager;
-import com.azure.resourcemanager.keyvault.models.Vault;
-import com.azure.resourcemanager.resources.models.GenericResource;
 import com.azure.security.keyvault.secrets.SecretClient;
 import com.azure.security.keyvault.secrets.SecretClientBuilder;
 import org.eclipse.dataspaceconnector.azure.dataplane.azuredatafactory.pipeline.AzureDataFactoryTransferServiceImpl;
@@ -38,6 +34,15 @@ public class DataPlaneAzureDataFactoryExtension implements ServiceExtension {
     @Inject
     private TransferServiceRegistry registry;
 
+    @Inject
+    private AzureProfile profile;
+
+    @Inject
+    private AzureResourceManager resourceManager;
+
+    @Inject
+    private TokenCredential credential;
+
     @Override
     public String name() {
         return "Data Plane Azure Data Factory";
@@ -50,16 +55,10 @@ public class DataPlaneAzureDataFactoryExtension implements ServiceExtension {
         String keyVaultLinkedService = context.getSetting("edc.datafactory.keyvault.linkedservicename", "AzureKeyVault");
         String dataFactoryId = requiredSetting(context, "edc.datafactory.resourceid");
         String keyVaultId = requiredSetting(context, "edc.datafactory.keyvault.resourceid");
-        String tenantId = requiredSetting(context, "edc.datafactory.tenantid");
-        String subscriptionId = requiredSetting(context, "edc.datafactory.subscriptionid");
 
-        AzureCliCredential credential = new AzureCliCredentialBuilder().build();
-        AzureProfile profile = new AzureProfile(tenantId, subscriptionId, AzureEnvironment.AZURE);
-        DataFactoryManager dataFactoryManager = DataFactoryManager.authenticate(credential, profile);
-        AzureResourceManager resourceManager = AzureResourceManager.authenticate(credential, profile)
-                .withSubscription(subscriptionId);
-        GenericResource factory = resourceManager.genericResources().getById(dataFactoryId);
-        Vault vault = resourceManager.vaults().getById(keyVaultId);
+        var dataFactoryManager = DataFactoryManager.authenticate(credential, profile);
+        var factory = resourceManager.genericResources().getById(dataFactoryId);
+        var vault = resourceManager.vaults().getById(keyVaultId);
 
         SecretClient secretClient = new SecretClientBuilder()
                 .vaultUrl(vault.vaultUri())

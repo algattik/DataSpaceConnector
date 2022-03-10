@@ -1,15 +1,31 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -euo pipefail
 
-REPO=agera-edc/DataSpaceConnector
+REPO=${1:-eclipse-dataspaceconnector/DataSpaceConnector}
+ENVIRONMENT=Azure-dev
 
+gh="gh --repo $REPO --env $ENVIRONMENT"
+
+echo "== Checking GitHub contributor permissions =="
+if ! $gh secret list > /dev/null
+then
+  echo "Cannot access repo $REPO"
+  echo "Usage: $0 OWNER/REPO"
+  echo "OWNER/REPO must be a repository on which you have Contributor permissions."
+  exit 1
+fi
+
+echo "== Running terraform init =="
 terraform init
 
-terraform apply --auto-approve
+echo "== Running terraform apply =="
+terraform apply
 
-terraform output -json | gh secret set CLOUD_SETTINGS --repo $REPO --env Azure-dev 
-terraform output -raw ci_client_id | gh secret set AZURE_CLIENT_ID --repo $REPO --env Azure-dev
-terraform output -raw subscription_id | gh secret set AZURE_SUBSCRIPTION_ID --repo $REPO --env Azure-dev
-terraform output -raw tenant_id | gh secret set AZURE_TENANT_ID --repo $REPO --env Azure-dev
+echo "== Collecting terraform outputs =="
+terraform output -json | $gh secret set TERRAFORM_OUTPUTS
+
+terraform output -raw ci_client_id | $gh secret set AZURE_CLIENT_ID
+terraform output -raw EDC_AZURE_SUBSCRIPTIONID | $gh secret set AZURE_SUBSCRIPTION_ID
+terraform output -raw EDC_AZURE_TENANTID | $gh secret set AZURE_TENANT_ID
 

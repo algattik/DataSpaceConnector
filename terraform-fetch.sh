@@ -2,6 +2,10 @@
 
 set -euxo pipefail
 
+output=terraform_outputs.json
+
 terraform init
 
-terraform output -json > cloud_settings.json
+terraform output -json > $output
+
+echo Created $output

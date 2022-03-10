@@ -12,9 +12,9 @@
  *
  */
 
-val okHttpVersion: String by project
-val storageBlobVersion: String by project;
-val jodahFailsafeVersion: String by project
+val azureIdentityVersion: String by project
+val azureResourceManagerVersion: String by project
+val awaitility: String by project
 
 plugins {
     `java-library`
@@ -22,18 +22,22 @@ plugins {
 
 dependencies {
     implementation(project(":extensions:azure:data-plane:common"))
+    implementation(project(":extensions:azure:resource-manager"))
     implementation(project(":common:util"))
+    implementation("com.azure:azure-identity:${azureIdentityVersion}")
     implementation("com.azure.resourcemanager:azure-resourcemanager-datafactory:1.0.0-beta.12")
-    implementation("com.azure:azure-identity:1.4.4")
-    implementation("com.azure.resourcemanager:azure-resourcemanager:2.12.0")
-    implementation("com.azure.resourcemanager:azure-resourcemanager-storage:2.12.0")
-    implementation("com.azure:azure-security-keyvault-secrets:4.2.3")
-    testImplementation("commons-io:commons-io:2.11.0")
+    implementation("com.azure.resourcemanager:azure-resourcemanager-storage:${azureResourceManagerVersion}")
+    implementation("com.azure.resourcemanager:azure-resourcemanager-keyvault:${azureResourceManagerVersion}")
+    implementation("com.azure.resourcemanager:azure-resourcemanager:${azureResourceManagerVersion}")
+    implementation("com.azure.resourcemanager:azure-resourcemanager-authorization:${azureResourceManagerVersion}")
 
+    testImplementation("commons-io:commons-io:2.11.0")
+    testImplementation(project(":extensions:data-plane:data-plane-framework"))
     testImplementation(testFixtures(project(":extensions:azure:azure-test")))
     testImplementation(testFixtures(project(":extensions:azure:data-plane:storage")))
     testImplementation(testFixtures(project(":common:util")))
     testImplementation(testFixtures(project(":launchers:junit")))
+    testImplementation("org.awaitility:awaitility:${awaitility}")
 }
 
 publishing {

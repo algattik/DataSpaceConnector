@@ -80,16 +80,10 @@ resource "azurerm_resource_group" "main" {
 output "ci_client_id" {
   value = var.ci_client_id
 }
-output "tenant_id" {
+output "EDC_AZURE_TENANTID" {
   value = data.azurerm_client_config.current.tenant_id
 }
-output "subscription_id" {
-  value = data.azurerm_client_config.current.subscription_id
-}
-output "EDC_DATAFACTORY_TENANTID" {
-  value = data.azurerm_client_config.current.tenant_id
-}
-output "EDC_DATAFACTORY_SUBSCRIPTIONID" {
+output "EDC_AZURE_SUBSCRIPTIONID" {
   value = data.azurerm_client_config.current.subscription_id
 }
 output "EDC_DATAFACTORY_RESOURCEID" {
@@ -98,9 +92,9 @@ output "EDC_DATAFACTORY_RESOURCEID" {
 output "EDC_DATAFACTORY_KEYVAULT_RESOURCEID" {
   value = "subscriptions/9d236f09-93d9-4f41-88a6-20201a6a1abc/resourceGroups/adfspike-provider/providers/Microsoft.KeyVault/vaults/edcageraspikeadfvault"
 }
-output "EDC_PROVIDER_STORAGE_RESOURCEID" {
+output "edc_test_provider_storage_resourceid" {
   value = "subscriptions/9d236f09-93d9-4f41-88a6-20201a6a1abc/resourceGroups/adfspike-provider/providers/Microsoft.Storage/storageAccounts/edcproviderstore"
 }
-output "EDC_CONSUMER_STORAGE_RESOURCEID" {
+output "edc_test_consumer_storage_resourceid" {
   value = "subscriptions/9d236f09-93d9-4f41-88a6-20201a6a1abc/resourceGroups/adfspike-consumer/providers/Microsoft.Storage/storageAccounts/edcconsumerstore"
 }

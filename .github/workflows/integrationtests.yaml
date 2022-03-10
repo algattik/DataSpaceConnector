@@ -13,8 +13,8 @@ jobs:
     steps:
       - id: has-azure
         env:
-          FEATURE: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        if: "${{ env.FEATURE != '' }}"
+          HAS_AZURE: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        if: "${{ env.HAS_AZURE != '' }}"
         run: echo "::set-output name=defined::true"
     outputs:
       has-azure: ${{ steps.has-azure.outputs.defined }}
@@ -46,13 +46,13 @@ jobs:
 
       - name: "terraform outputs"
         run: |
-          printf "$CLOUD_SETTINGS" > cloud_settings.json
+          printf "$TERRAFORM_OUTPUTS" > terraform_outputs.json
         env:
-          CLOUD_SETTINGS: ${{ secrets.CLOUD_SETTINGS }}
+          TERRAFORM_OUTPUTS: ${{ secrets.TERRAFORM_OUTPUTS }}
 
       - name: "terraform outputs"
         run: |
-          cat cloud_settings.json
+          cat terraform_outputs.json | jq -r 'keys | .[]'
 
       - uses: actions/setup-java@v2
         with:
