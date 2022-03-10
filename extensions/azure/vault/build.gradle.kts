@@ -25,6 +25,7 @@ dependencies {
     api(project(":spi:core-spi"))
 
     implementation(project(":common:util"))
+    implementation("com.azure:azure-security-keyvault-secrets:4.2.3")
     implementation("com.azure:azure-identity:${azureIdentityVersion}")
     implementation("jakarta.ws.rs:jakarta.ws.rs-api:${rsApi}")
 
