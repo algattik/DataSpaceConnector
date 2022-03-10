@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+cd $(dirname "$0")
+
 . .env
 
 # Create resource group

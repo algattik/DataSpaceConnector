@@ -5,6 +5,8 @@ set -euo pipefail
 set -a
 . .env
 
+cd terraform
+
 cat > generated_backend.tf <<EOF
 terraform {
   backend "azurerm" {

@@ -46,7 +46,7 @@ jobs:
 
       - name: "terraform outputs"
         run: |
-          printf "$TERRAFORM_OUTPUTS" > terraform_outputs.json
+          printf "$TERRAFORM_OUTPUTS" > resources/azure/testing/terraform_outputs.json
         env:
           TERRAFORM_OUTPUTS: ${{ secrets.TERRAFORM_OUTPUTS }}
 

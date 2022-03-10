@@ -33,7 +33,7 @@ public class TerraformOutputsExtension implements BeforeAllCallback, AfterAllCal
         var mapper = new ObjectMapper();
         var root = GradleUtils.findRoot();
         @SuppressWarnings("unchecked")
-        Map<String, Map<String, Object>> v = mapper.readValue(new File(root, "terraform_outputs.json"), Map.class);
+        Map<String, Map<String, Object>> v = mapper.readValue(new File(root, "resources/azure/testing/terraform_outputs.json"), Map.class);
         for (var entry : v.entrySet()) {
             System.setProperty(entry.getKey(), entry.getValue().get("value").toString());
         }

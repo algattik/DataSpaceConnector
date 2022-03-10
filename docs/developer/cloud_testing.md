@@ -53,7 +53,7 @@ You will need:
 The shell scripts that wrap Terraform commands take their configuration from a file named `.env` that should not be committed into the repository (though the file should be shared across developers in your fork). Copy and adapt the example settings file to your environment, following the comments in the file:
 
 ```bash
-cp .env.example .env
+cp resources/azure/testing/.env.example resources/azure/testing/.env
 ```
 
 ### Deploying Terraform resources
@@ -61,13 +61,13 @@ cp .env.example .env
 The first time only, set up the state storage account by running this script:
 
 ```bash
-./terraform-initialize.sh
+resources/azure/testing/terraform-initialize.sh
 ```
 
 After that, run this script to update cloud resources. Follow the prompt and enter `yes` if requested to apply any changes:
 
 ```bash
-./terraform-apply.sh
+resources/azure/testing/terraform-apply.sh
 ```
 
 The script also configures your repository's GitHub Environment so that workflows can consume the resources. The following secrets are provisioned in the Environment:

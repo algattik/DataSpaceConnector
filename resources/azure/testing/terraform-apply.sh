@@ -4,8 +4,10 @@ set -euo pipefail
 
 ENVIRONMENT=Azure-dev
 
+cd $(dirname "$0")
+
 echo "== Running terraform init =="
-. terraform-init.sh
+. util/terraform-init.sh
 
 echo "== Checking GitHub contributor permissions =="
 gh="gh --repo $GITHUB_REPO --env $ENVIRONMENT"
@@ -27,4 +29,5 @@ terraform output -raw ci_client_id | $gh secret set AZURE_CLIENT_ID
 terraform output -raw EDC_AZURE_SUBSCRIPTIONID | $gh secret set AZURE_SUBSCRIPTION_ID
 terraform output -raw EDC_AZURE_TENANTID | $gh secret set AZURE_TENANT_ID
 
-. terraform-fetch.sh
+cd ..
+. util/terraform-download-output.sh
