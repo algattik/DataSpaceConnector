@@ -99,34 +99,38 @@ resource "azurerm_role_assignment" "consumer_ci_client" {
 
 ## Create AKV
 resource "azurerm_key_vault" "main" {
-  name                = "kv${var.prefix}adf"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  sku_name            = "standard"
+  name                      = "kv${var.prefix}adf"
+  location                  = azurerm_resource_group.main.location
+  resource_group_name       = azurerm_resource_group.main.name
+  tenant_id                 = data.azurerm_client_config.current.tenant_id
+  sku_name                  = "standard"
+  enable_rbac_authorization = true
 }
 
 ## Create ADF
 resource "azurerm_data_factory" "main" {
-  name                = "df-${var.prefix}-main"
+  name                = "adf-${var.prefix}-main"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
 ## Create ADF linked service to retrieve keys from AKV
-resource "azurerm_data_factory_linked_service_key_vault" "example" {
-  name                = "example"
+resource "azurerm_data_factory_linked_service_key_vault" "main" {
+  name                = "AzureKeyVault"
   resource_group_name = azurerm_resource_group.main.name
   data_factory_id     = azurerm_data_factory.main.id
   key_vault_id        = azurerm_key_vault.main.id
 }
 
 ## Grant ADF read access to AKV secrets
-#resource "azurerm_role_assignment" "data_factory_key_vault" {
-#  scope                = azurerm_key_vault.main.id
-#  role_definition_name = "Key Vault Secrets User"
-#  principal_id         = azurerm_data_factory.main.identity[0].principal_id
-#}
+resource "azurerm_role_assignment" "data_factory_key_vault" {
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_data_factory.main.identity[0].principal_id
+}
 
 ## Grant DPF write access to AKV secrets
 resource "azurerm_role_assignment" "ci_key_vault" {
@@ -155,15 +159,17 @@ output "EDC_AZURE_SUBSCRIPTIONID" {
   value = data.azurerm_client_config.current.subscription_id
 }
 output "EDC_DATAFACTORY_RESOURCEID" {
-  # value = azurerm_data_factory.main.id
-  value = "subscriptions/9d236f09-93d9-4f41-88a6-20201a6a1abc/resourceGroups/adfspike-provider/providers/Microsoft.DataFactory/factories/edcageraspikeadf"
+  value = azurerm_data_factory.main.id
 }
 output "EDC_DATAFACTORY_KEYVAULT_RESOURCEID" {
-  value = "subscriptions/9d236f09-93d9-4f41-88a6-20201a6a1abc/resourceGroups/adfspike-provider/providers/Microsoft.KeyVault/vaults/edcageraspikeadfvault"
+  value = azurerm_key_vault.main.id
+}
+output "EDC_DATAFACTORY_KEYVAULT_LINKEDSERVICENAME" {
+  value = azurerm_data_factory_linked_service_key_vault.main.name
 }
 output "edc_test_provider_storage_resourceid" {
-  value = "subscriptions/9d236f09-93d9-4f41-88a6-20201a6a1abc/resourceGroups/adfspike-provider/providers/Microsoft.Storage/storageAccounts/edcproviderstore"
+  value = azurerm_storage_account.provider.id
 }
 output "edc_test_consumer_storage_resourceid" {
-  value = "subscriptions/9d236f09-93d9-4f41-88a6-20201a6a1abc/resourceGroups/adfspike-consumer/providers/Microsoft.Storage/storageAccounts/edcconsumerstore"
+  value = azurerm_storage_account.consumer.id
 }

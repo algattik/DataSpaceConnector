@@ -1,5 +1,16 @@
 ## Working with Terraform
 
+### Planning your deployment
+
+You will need:
+
+- An Azure subscription
+- A service principal (instructions below)
+- For developers to be able to use their own identity, grant them the following roles at the Subscription level, or on the Resource Group created to hold Terraform resources.
+  - `Storage Account Contributor` (or `Contributor`)
+  - `Data Factory Contributor` (or `Contributor`)
+  - `Key Vault Secrets Officer`
+
 ### Create a service identity for CI
 
 Create a service principal.
