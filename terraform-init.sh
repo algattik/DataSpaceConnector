@@ -2,6 +2,7 @@
 
 set -euo pipefail
 
+set -a
 . .env
 
 cat > generated_backend.tf <<EOF
