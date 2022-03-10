@@ -22,26 +22,18 @@ provider "azurerm" {
 
 # Data
 
-# Make client_id, tenant_id, subscription_id and object_id variables
+# Make client_id, tenant_id, subscription_id and object_id variables available
 data "azurerm_client_config" "current" {}
 
 ######### variables.tf
 
 variable "ci_client_id" {
-  type        = string
-  default     = "5f93ea5f-c0f0-4f6f-876f-c346d0127e61"
+  type = string
 }
 
-variable "appname" {
+variable "prefix" {
   type        = string
   description = "Application name. Use only lowercase letters and numbers"
-  default     = "starterterraform"
-}
-
-variable "environment" {
-  type        = string
-  description = "Environment name, e.g. 'dev' or 'stage'"
-  default     = "dev"
 }
 
 variable "location" {
@@ -50,21 +42,18 @@ variable "location" {
   default     = "North Europe"
 }
 
-variable "department" {
-  type        = string
-  description = "A sample variable passed from the build pipeline and used to tag resources."
-  default     = "Engineering"
-}
-
 ######### main.tf
 
 
 resource "azurerm_resource_group" "main" {
-  name     = "rg-${var.appname}-${var.environment}-main"
+  name     = "rg-${var.prefix}-main"
   location = var.location
-  tags     = {
-    department = var.department
-  }
+}
+
+resource "azurerm_data_factory" "main" {
+  name                = "df-${var.prefix}-main"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 }
 
 ######### outputs.tf
@@ -80,7 +69,7 @@ output "EDC_AZURE_SUBSCRIPTIONID" {
   value = data.azurerm_client_config.current.subscription_id
 }
 output "EDC_DATAFACTORY_RESOURCEID" {
-  value = "subscriptions/9d236f09-93d9-4f41-88a6-20201a6a1abc/resourceGroups/adfspike-provider/providers/Microsoft.DataFactory/factories/edcageraspikeadf"
+  value = azurerm_data_factory.main.id
 }
 output "EDC_DATAFACTORY_KEYVAULT_RESOURCEID" {
   value = "subscriptions/9d236f09-93d9-4f41-88a6-20201a6a1abc/resourceGroups/adfspike-provider/providers/Microsoft.KeyVault/vaults/edcageraspikeadfvault"

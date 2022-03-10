@@ -19,7 +19,7 @@ The first time only, set up the state storage account by running this script:
 After that, run this script to update cloud resources. Follow the prompt and enter `yes` to apply any changes:
 
 ```bash
-./terraform-run.sh
+./terraform-apply.sh
 ```
 
 The script also configures your repository's GitHub Environment so that workflows can consume the resources.
