@@ -1,5 +1,21 @@
 ## Working with Terraform
 
+### Create a service identity for CI
+
+Create a service principal.
+
+https://docs.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust-github?tabs=azure-portal
+
+Configure the application to trust your GitHub repository.
+
+https://docs.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust-github?tabs=azure-portal
+
+For **Entity Type**, select **Environment**.
+
+For **Environment Name**, type `Azure-dev`.
+
+For **Name**, type any name.
+
 ### Configure Terraform scripts
 
 Copy and adapt the settings file to your environment:
