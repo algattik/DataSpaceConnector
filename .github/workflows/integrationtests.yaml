@@ -44,15 +44,15 @@ jobs:
 
       - uses: actions/checkout@v2
 
-      - name: "terraform outputs"
+      - name: "Fetch Terraform outputs"
         run: |
           printf "$TERRAFORM_OUTPUTS" > resources/azure/testing/terraform_outputs.json
         env:
           TERRAFORM_OUTPUTS: ${{ secrets.TERRAFORM_OUTPUTS }}
 
-      - name: "terraform outputs"
+      - name: "List Terraform output keys"
         run: |
-          cat terraform_outputs.json | jq -r 'keys | .[]'
+          cat resources/azure/testing/terraform_outputs.json | jq -r 'keys | .[]'
 
       - uses: actions/setup-java@v2
         with:
