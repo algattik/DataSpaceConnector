@@ -66,7 +66,8 @@ class AzureDataFactoryCopyIntegrationTest {
     }
 
     @Test
-    void transfer_success(AzureResourceManager azure, DataPlaneManager registry) {
+    void transfer_success(AzureResourceManager azure, DataPlaneManager dataPlaneManager) {
+        // Arrange
         providerStorage = new Account(azure, "test_provider_storage_resourceid");
         consumerStorage = new Account(azure, "test_consumer_storage_resourceid");
         byte[] randomBytes = new byte[1024];
@@ -98,8 +99,10 @@ class AzureDataFactoryCopyIntegrationTest {
                 .processId(UUID.randomUUID().toString())
                 .build();
 
-        registry.initiateTransfer(request);
+        // Act
+        dataPlaneManager.initiateTransfer(request);
 
+        // Assert
         var destinationBlob = consumerStorage.client
                 .getBlobContainerClient(consumerStorage.containerName)
                 .getBlobClient(blobName);
@@ -112,7 +115,7 @@ class AzureDataFactoryCopyIntegrationTest {
                 .isEqualTo(randomBytes.length);
     }
 
-    private static class Account {
+    static class Account {
 
         final static Faker FAKER = new Faker();
         final String name;
@@ -132,7 +135,7 @@ class AzureDataFactoryCopyIntegrationTest {
             createContainer();
         }
 
-        private void createContainer() {
+        void createContainer() {
             assertFalse(client.getBlobContainerClient(containerName).exists());
 
             BlobContainerClient blobContainerClient = client.createBlobContainer(containerName);
