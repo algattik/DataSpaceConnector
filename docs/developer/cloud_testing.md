@@ -40,13 +40,24 @@ You will need:
   - [Terraform CLI](https://learn.hashicorp.com/tutorials/terraform/install-cli)
   - [GitHub CLI](https://cli.github.com)
 
-### Create a service identity for the GitHub environment
+### Create a service identity for the GitHub Environment
 
-[Create and configure an application for your GitHub environment](https://docs.microsoft.com/azure/active-directory/develop/workload-identity-federation-create-trust-github).
+[Create and configure an application for your GitHub Environment](https://docs.microsoft.com/azure/active-directory/develop/workload-identity-federation-create-trust-github).
+
+Follow the instructions to *Create an app registration*.
+
+- In **Supported Account Types**, select **Accounts in this organizational directory only**.
+- Don't enter anything for **Redirect URI (optional)**.
+
+Take note of the Application (client) ID.
+
+Follow the instructions to *Configure a federated identity credential*.
 
 - For **Entity Type**, select **Environment**.
-- For **Environment Name**, type `Azure-dev`.
+- For **Environment Name**, type `Azure-dev`. That is the environment name hard-coded in the workflow definition.
 - For **Name**, type any name.
+
+Note that the GitHub Environment itself is created automatically when used in a workflow, you don't need to take any action to create the Environment in your GitHub repository.
 
 ### Configure Terraform settings
 
@@ -55,6 +66,13 @@ The shell scripts that wrap Terraform commands take their configuration from a f
 ```bash
 cp resources/azure/testing/.env.example resources/azure/testing/.env
 ```
+
+At a minimum, you must modify the following values:
+
+- `GITHUB_REPO` (to reflect your fork)
+- `TERRAFORM_STATE_STORAGE_ACCOUNT` (must be globally unique)
+- `TF_VAR_ci_client_id` (using the App registration created in the previous step)
+- `TF_VAR_prefix` (must be globally unique)
 
 ### Deploying Terraform resources
 
@@ -88,3 +106,9 @@ For running cloud tests in local development, run this script to download a `ter
 ```
 
 This downloads a `terraform_outputs.json` file, which is read by cloud integration tests. This file should not be committed to the repository.
+
+### Evolving Terraform configuration
+
+When doing changes to the Terraform configuration, keep in mind that the cloud resources, as well as the Terraform output values, are shared with other branches. You must ensure that any changes are backward compatible.
+
+For example, if changing a test so that a resource is not needed anymore, do not remove the resource from the Terraform configuration in the same PR.
