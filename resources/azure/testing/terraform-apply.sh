@@ -29,5 +29,4 @@ terraform output -raw ci_client_id | $gh secret set AZURE_CLIENT_ID
 terraform output -raw EDC_AZURE_SUBSCRIPTIONID | $gh secret set AZURE_SUBSCRIPTION_ID
 terraform output -raw EDC_AZURE_TENANTID | $gh secret set AZURE_TENANT_ID
 
-cd ..
-. util/terraform-download-output.sh
+. ../util/terraform-download-output.sh

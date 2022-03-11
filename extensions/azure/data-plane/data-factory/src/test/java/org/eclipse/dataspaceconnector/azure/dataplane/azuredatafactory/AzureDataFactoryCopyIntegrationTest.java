@@ -66,8 +66,7 @@ class AzureDataFactoryCopyIntegrationTest {
     }
 
     @Test
-    void transfer_success(AzureResourceManager azure,
-                          DataPlaneManager registry) throws Exception {
+    void transfer_success(AzureResourceManager azure, DataPlaneManager registry) {
         providerStorage = new Account(azure, "test_provider_storage_resourceid");
         consumerStorage = new Account(azure, "test_consumer_storage_resourceid");
         byte[] randomBytes = new byte[1024];

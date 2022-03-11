@@ -15,6 +15,7 @@ data "azuread_service_principal" "ci_client" {
 resource "azurerm_resource_group" "main" {
   name     = "rg-${var.prefix}-main"
   location = var.location
+  tags     = var.resource_tags
 }
 
 ## Create storage accounts for provider-side data (source) and consumer-side data (sink)
@@ -24,6 +25,7 @@ resource "azurerm_storage_account" "provider" {
   location                 = azurerm_resource_group.main.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  tags                     = var.resource_tags
 }
 
 resource "azurerm_role_assignment" "provider_ci_client" {
@@ -39,6 +41,7 @@ resource "azurerm_storage_account" "consumer" {
   location                 = azurerm_resource_group.main.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  tags                     = var.resource_tags
 }
 
 resource "azurerm_role_assignment" "consumer_ci_client" {
@@ -55,6 +58,7 @@ resource "azurerm_key_vault" "main" {
   tenant_id                 = data.azurerm_client_config.current.tenant_id
   sku_name                  = "standard"
   enable_rbac_authorization = true
+  tags                      = var.resource_tags
 }
 
 ## Create ADF
@@ -65,6 +69,7 @@ resource "azurerm_data_factory" "main" {
   identity {
     type = "SystemAssigned"
   }
+  tags = var.resource_tags
 }
 
 ## Create ADF linked service to retrieve keys from AKV
