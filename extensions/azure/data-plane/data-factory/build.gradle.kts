@@ -31,7 +31,6 @@ dependencies {
     implementation("com.azure.resourcemanager:azure-resourcemanager:${azureResourceManagerVersion}")
     implementation("com.azure.resourcemanager:azure-resourcemanager-authorization:${azureResourceManagerVersion}")
 
-    testImplementation("commons-io:commons-io:2.11.0")
     testImplementation(project(":extensions:data-plane:data-plane-framework"))
     testImplementation(testFixtures(project(":extensions:azure:azure-test")))
     testImplementation(testFixtures(project(":extensions:azure:data-plane:storage")))

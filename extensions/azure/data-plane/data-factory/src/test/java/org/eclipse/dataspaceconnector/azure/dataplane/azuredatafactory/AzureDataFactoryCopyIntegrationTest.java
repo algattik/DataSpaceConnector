@@ -20,7 +20,7 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.common.StorageSharedKeyCredential;
 import com.github.javafaker.Faker;
-import org.apache.commons.io.input.BoundedInputStream;
+import org.eclipse.dataspaceconnector.common.annotations.IntegrationTest;
 import org.eclipse.dataspaceconnector.dataplane.spi.manager.DataPlaneManager;
 import org.eclipse.dataspaceconnector.junit.launcher.EdcExtension;
 import org.eclipse.dataspaceconnector.junit.launcher.TerraformOutputsExtension;
@@ -30,11 +30,12 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,16 +49,16 @@ import static org.eclipse.dataspaceconnector.azure.dataplane.azurestorage.schema
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@IntegrationTest
 @ExtendWith({TerraformOutputsExtension.class, EdcExtension.class})
 class AzureDataFactoryCopyIntegrationTest {
 
     static List<Runnable> containerCleanup = new ArrayList<>();
 
     String blobName = createBlobName();
-    long blobSize = 100L * 1024;
 
-    Account account1;
-    Account account2;
+    Account providerStorage;
+    Account consumerStorage;
 
     @AfterAll
     static void tearDownClass() {
@@ -67,31 +68,29 @@ class AzureDataFactoryCopyIntegrationTest {
     @Test
     void transfer_success(AzureResourceManager azure,
                           DataPlaneManager registry) throws Exception {
-        account1 = new Account(azure, "edc_test_provider_storage_resourceid");
-        account2 = new Account(azure, "edc_test_consumer_storage_resourceid");
+        providerStorage = new Account(azure, "edc_test_provider_storage_resourceid");
+        consumerStorage = new Account(azure, "edc_test_consumer_storage_resourceid");
+        byte[] randomBytes = new byte[1024];
+        new Random().nextBytes(randomBytes);
 
-        try (var os =
-                     account1.client
-                             .getBlobContainerClient(account1.containerName)
-                             .getBlobClient(blobName)
-                             .getBlockBlobClient()
-                             .getBlobOutputStream()) {
-            new BoundedInputStream(
-                    new FileInputStream("/dev/urandom"), blobSize).transferTo(os);
-        }
+        providerStorage.client
+                .getBlobContainerClient(providerStorage.containerName)
+                .getBlobClient(blobName)
+                .getBlockBlobClient()
+                .upload(new ByteArrayInputStream(randomBytes), randomBytes.length);
 
         var source = DataAddress.Builder.newInstance()
                 .type(TYPE)
-                .property(ACCOUNT_NAME, account1.name)
-                .property(CONTAINER_NAME, account1.containerName)
+                .property(ACCOUNT_NAME, providerStorage.name)
+                .property(CONTAINER_NAME, providerStorage.containerName)
                 .property(BLOB_NAME, blobName)
-                .property(SHARED_KEY, account1.key)
+                .property(SHARED_KEY, providerStorage.key)
                 .build();
         var destination = DataAddress.Builder.newInstance()
                 .type(TYPE)
-                .property(ACCOUNT_NAME, account2.name)
-                .property(CONTAINER_NAME, account2.containerName)
-                .property(SHARED_KEY, account2.key)
+                .property(ACCOUNT_NAME, consumerStorage.name)
+                .property(CONTAINER_NAME, consumerStorage.containerName)
+                .property(SHARED_KEY, consumerStorage.key)
                 .build();
         var request = DataFlowRequest.Builder.newInstance()
                 .sourceDataAddress(source)
@@ -102,8 +101,8 @@ class AzureDataFactoryCopyIntegrationTest {
 
         registry.initiateTransfer(request);
 
-        var destinationBlob = account2.client
-                .getBlobContainerClient(account2.containerName)
+        var destinationBlob = consumerStorage.client
+                .getBlobContainerClient(consumerStorage.containerName)
                 .getBlobClient(blobName);
         await()
                 .atMost(Duration.ofMinutes(5))
@@ -111,7 +110,7 @@ class AzureDataFactoryCopyIntegrationTest {
                         .withFailMessage("should have copied blob between containers")
                         .isTrue());
         assertThat(destinationBlob.getProperties().getBlobSize())
-                .isEqualTo(blobSize);
+                .isEqualTo(randomBytes.length);
     }
 
     private static class Account {
