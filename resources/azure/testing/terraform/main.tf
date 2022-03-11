@@ -1,67 +1,17 @@
-######### provider.tf
-
-#Set the terraform required version
-terraform {
-  required_version = ">= 1.0"
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      # It is recommended to pin to a given version of the Provider
-      version = "=2.98.0"
-    }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "=2.15.0"
-    }
-  }
-}
-
-
-# Configure the Microsoft Azure Provider
-provider "azurerm" {
-  features {
-    key_vault {
-      # Do not retain Azure Key Vaults after destruction
-      purge_soft_delete_on_destroy = true
-    }
-  }
-}
-
-
-# Data
-
-# Make client_id, tenant_id, subscription_id and object_id variables available
-data "azurerm_client_config" "current" {}
-
-######### variables.tf
-
-variable "ci_client_id" {
-  type = string
-}
-
-variable "prefix" {
-  type        = string
-  description = "Application name. Use only lowercase letters and numbers"
-}
-
-variable "location" {
-  type        = string
-  description = "Azure region where to create resources."
-  default     = "North Europe"
-}
-
-######### main.tf
-
 ## This configuration creates and configures the following resources:
 ## - Azure Key Vault (AKV) instance for managing data factory secrets
 ## - Azure Data Factory (ADF) instance connected to AKV
 ## - Storage accounts for integration tests, representing provider and consumer side
 
+# Get information about the identity Terraform runs under
+data "azurerm_client_config" "current" {}
+
+# Get information about the GitHub workflow identity
 data "azuread_service_principal" "ci_client" {
   application_id = var.ci_client_id
 }
 
+# Create a resource group to store resources
 resource "azurerm_resource_group" "main" {
   name     = "rg-${var.prefix}-main"
   location = var.location
@@ -144,32 +94,4 @@ resource "azurerm_role_assignment" "data_factory" {
   scope                = azurerm_data_factory.main.id
   role_definition_name = "Data Factory Contributor"
   principal_id         = data.azuread_service_principal.ci_client.object_id
-}
-
-######### outputs.tf
-
-
-output "ci_client_id" {
-  value = var.ci_client_id
-}
-output "EDC_AZURE_TENANTID" {
-  value = data.azurerm_client_config.current.tenant_id
-}
-output "EDC_AZURE_SUBSCRIPTIONID" {
-  value = data.azurerm_client_config.current.subscription_id
-}
-output "EDC_DATAFACTORY_RESOURCEID" {
-  value = azurerm_data_factory.main.id
-}
-output "EDC_DATAFACTORY_KEYVAULT_RESOURCEID" {
-  value = azurerm_key_vault.main.id
-}
-output "EDC_DATAFACTORY_KEYVAULT_LINKEDSERVICENAME" {
-  value = azurerm_data_factory_linked_service_key_vault.main.name
-}
-output "edc_test_provider_storage_resourceid" {
-  value = azurerm_storage_account.provider.id
-}
-output "edc_test_consumer_storage_resourceid" {
-  value = azurerm_storage_account.consumer.id
 }
